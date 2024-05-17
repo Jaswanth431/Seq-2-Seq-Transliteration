@@ -214,7 +214,7 @@ def inference(encoder, decoder, source_sequence, target_tensor, data, device, h_
         encoder_outputs, encoder_hidden = encoder(source_sequence, encoder_hidden)
 
         # Initialize decoder input with start token
-        decoder_input = torch.full((h_params["batch_size"], 1), data['target_char_index'][START_TOKEN], device=device)
+        decoder_input_tensor = torch.full((h_params["batch_size"], 1), data['target_char_index'][START_TOKEN], device=device)
         decoder_actual_output = []
         
         # Initialize decoder hidden state with encoder hidden state
@@ -224,7 +224,7 @@ def inference(encoder, decoder, source_sequence, target_tensor, data, device, h_
         for di in range(data["OUTPUT_MAX_LENGTH"]):
             curr_target_chars = target_tensor[:, di]
             # Perform decoding for one time step
-            decoder_output, decoder_hidden = decoder(decoder_input, decoder_hidden)
+            decoder_output, decoder_hidden = decoder(decoder_input_tensor, decoder_hidden)
             topv, topi = decoder_output.topk(1)
             decoder_input_tensor = topi.squeeze().detach()
             decoder_actual_output.append(decoder_input_tensor)
@@ -375,17 +375,17 @@ def train(h_params, data, device, train_dataloader, val_dataloader):
     encoder, decoder, loss_fn = train_loop(encoder, decoder, h_params, data, train_dataloader, val_dataloader, device)
     return encoder, decoder, loss_fn
 
-# h_params = {
-#     "char_embd_dim": 256,
-#     "hidden_layer_neurons": 256,
-#     "batch_size": 32,
-#     "number_of_layers": 3,
-#     "learning_rate": 0.0001,
-#     "epochs": 20,
-#     "cell_type": "LSTM",
-#     "dropout": 0,
-#     "optimizer": "adam"
-# }
+h_params = {
+    "char_embd_dim": 256,
+    "hidden_layer_neurons": 256,
+    "batch_size": 32,
+    "number_of_layers": 3,
+    "learning_rate": 0.0001,
+    "epochs": 20,
+    "cell_type": "LSTM",
+    "dropout": 0,
+    "optimizer": "adam"
+}
 
 # Function to prepare dataloaders for training and validation
 def prepare_dataloaders(train_source, train_target, val_source, val_target, h_params):
@@ -411,13 +411,13 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Train a seq2seq model with specified hyperparameters")
     parser.add_argument("-wp", "--wandb_project", type=str, default="DL proj", help="Specifies the project name used to track experiments in the Weights & Biases dashboard")
     parser.add_argument("-e", "--epochs", type=int, default=20, help="Sets the number of epochs to train the neural network")
-    parser.add_argument("-lr", "--learning_rate", type=float, default=0.0001, help="Sets the learning rate used to optimize model parameters")
-    parser.add_argument("-b", "--batch_size", type=int, default=32, help="Specifies the batch size used for training")
-    parser.add_argument("-embd_dim", "--char_embd_dim", type=int, default=256, help="Dimension of character embeddings")
-    parser.add_argument("-hid_neur", "--hidden_layer_neurons", type=int, default=256, help="Number of neurons in hidden layers")
-    parser.add_argument("-num_layers", "--number_of_layers", type=int, default=3, help="Number of layers in the encoder and decoder")
+    parser.add_argument("-lr", "--learning_rate", type=float, default=0.001, help="Sets the learning rate used to optimize model parameters")
+    parser.add_argument("-b", "--batch_size", type=int, default=64, help="Specifies the batch size used for training")
+    parser.add_argument("-embd_dim", "--char_embd_dim", type=int, default=128, help="Dimension of character embeddings")
+    parser.add_argument("-hid_neur", "--hidden_layer_neurons", type=int, default=512, help="Number of neurons in hidden layers")
+    parser.add_argument("-num_layers", "--number_of_layers", type=int, default=2, help="Number of layers in the encoder and decoder")
     parser.add_argument("-cell", "--cell_type", choices=["RNN", "LSTM", "GRU"], default="LSTM", help="Type of RNN cell: RNN, LSTM, GRU")
-    parser.add_argument("-do", "--dropout", type=float, default=0, help="Dropout probability")
+    parser.add_argument("-do", "--dropout", type=float, default=0.3, help="Dropout probability")
     parser.add_argument("-opt", "--optimizer", choices=["adam", "nadam"], default="adam", help="Optimization algorithm: adam, nadam")
     parser.add_argument("-train_path", "--train_path", type=str, required=True, help="Specifies the path for the training data (mandatory)")
     parser.add_argument("-test_path", "--test_path", type=str, required=True, help="Specifies the path for the testing data (mandatory)")
