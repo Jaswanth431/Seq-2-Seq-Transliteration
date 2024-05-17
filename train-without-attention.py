@@ -375,6 +375,17 @@ def train(h_params, data, device, train_dataloader, val_dataloader):
     encoder, decoder, loss_fn = train_loop(encoder, decoder, h_params, data, train_dataloader, val_dataloader, device)
     return encoder, decoder, loss_fn
 
+# h_params = {
+#     "char_embd_dim": 256,
+#     "hidden_layer_neurons": 256,
+#     "batch_size": 32,
+#     "number_of_layers": 3,
+#     "learning_rate": 0.0001,
+#     "epochs": 20,
+#     "cell_type": "LSTM",
+#     "dropout": 0,
+#     "optimizer": "adam"
+# }
 
 # Function to prepare dataloaders for training and validation
 def prepare_dataloaders(train_source, train_target, val_source, val_target, h_params):
