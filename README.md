@@ -1,4 +1,3 @@
-# DL Assignment 3
 # Seq2Seq Transliteration System
 This repository contains the implementation of a Seq2Seq model for a transliteration system, with two variants: one without attention and one with attention mechanism. The models are implemented using PyTorch.
 
